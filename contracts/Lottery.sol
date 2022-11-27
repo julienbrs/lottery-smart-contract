@@ -64,7 +64,7 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
     /* We emit an event when updating a dynamic array or mapping */
     /* Named events with the function name reversed : */
     event LotteryEnter(address indexed player);
-    event RequestedLotteryWinner(uint256 indexedId);
+    event RequestedLotteryWinner(uint256 requestId);
     event WinnerPicked(address indexed winner);
 
     function enterLottery() public payable {
@@ -108,17 +108,17 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
                 uint256(s_lotteryState)
             );
         }
-
         /*  1. Request random number to Oracle
             2. Grab the winner */
         s_lotteryState = LotteryState.CALCULATING;
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
-            i_keyHash, // = gasLane
+            i_keyHash,
             i_subscriptionId,
             REQUEST_CONFIRMATIONS,
             i_callbackGasLimit,
             NUM_WORDS
         );
+        // it is redondant, need to be refacted and use the event emitted by randomwordsrequested
         emit RequestedLotteryWinner(requestId);
     }
 
@@ -170,5 +170,9 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
 
     function getRequestConfirmations() public pure returns (uint256) {
         return REQUEST_CONFIRMATIONS;
+    }
+
+    function getInterval() public view returns (uint256) {
+        return i_interval;
     }
 }

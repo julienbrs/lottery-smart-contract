@@ -1,6 +1,6 @@
 const { deployments, network } = require("hardhat")
 const { developmentChains, networkConfig } = require("../helper-hardhat-config")
-const { verify } = require("../helper-hardhat-config")
+const { verify } = require("../utils/verify")
 
 const VRF_SUBSCRIPTION_FUND_AMOUNT = ethers.utils.parseEther("3")
 
@@ -8,10 +8,10 @@ module.exports = async function ({ getNamedAccounts, deployment }) {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
     const chainId = network.config.chainId
-    let vrfCoordinatorV2Address, subscriptionId
+    let vrfCoordinatorV2Address, subscriptionId, vrfCoordinatorV2Mock
 
     if (developmentChains.includes(network.name)) {
-        const vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock")
+        vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock")
         vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address
         // Create subscription for vrf with program
         const transactionResponse = await vrfCoordinatorV2Mock.createSubscription()
@@ -43,8 +43,24 @@ module.exports = async function ({ getNamedAccounts, deployment }) {
         waitConfirmations: network.config.blockConfirmations || 1,
     })
 
+    log("Contract Lottery deployed")
+
+    //we need to add consumer
+    if (developmentChains.includes(network.name)) {
+        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, lottery.address)
+        log("Consumer is added")
+    }
+
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
         log("Verifying the contract ...")
+        const args = [
+            vrfCoordinatorV2Address,
+            entranceFee,
+            keyHash,
+            subscriptionId,
+            callbackGasLimit,
+            interval,
+        ]
         await verify(lottery.address, args)
     }
     log("Contract verified!")
