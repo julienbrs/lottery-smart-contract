@@ -176,3 +176,5 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
         return i_interval;
     }
 }
+
+
