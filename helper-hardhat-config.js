@@ -13,6 +13,7 @@ const networkConfig = {
         subscriptionId: "6870",
         callbackGasLimit: "500000",
         interval: "5",
+        linkAdress: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
     },
     137: {
         name: "polygon",

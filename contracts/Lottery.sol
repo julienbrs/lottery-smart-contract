@@ -43,7 +43,7 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
     uint256 private i_interval;
 
     constructor(
-        address vrfCoordinatorV2, // Contract address of the Chainlink SC
+        address vrfCoordinatorV2, // Contract address of the Chainlink SC to generate random numbers
         uint256 entranceFee,
         bytes32 keyHash,
         uint64 subscriptionId,
@@ -51,7 +51,7 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
         uint256 interval
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
         i_entranceFee = entranceFee;
-        i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
+        i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2); // Interface of VRF functions & events
         i_keyHash = keyHash;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
@@ -176,5 +176,3 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
         return i_interval;
     }
 }
-
-
